@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem;
 
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
@@ -10,9 +11,11 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.Date;
 
@@ -21,7 +24,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class ParkingServiceTest {
 
-    private static ParkingService parkingService;
+    private static ParkingService underTest;
 
     @Mock
     private static InputReaderUtil inputReaderUtil;
@@ -31,7 +34,7 @@ public class ParkingServiceTest {
     private static TicketDAO ticketDAO;
 
     @BeforeEach
-    private void setUpPerTest() {
+    public void setUpPerTest() {
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 
@@ -45,7 +48,7 @@ public class ParkingServiceTest {
 
             when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
 
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            underTest = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         } catch (Exception e) {
             e.printStackTrace();
             throw  new RuntimeException("Failed to set up test mock objects");
@@ -54,8 +57,42 @@ public class ParkingServiceTest {
 
     @Test
     public void processExitingVehicleTest(){
-        parkingService.processExitingVehicle();
+        //GIVEN > WHEN
+        underTest.processExitingVehicle();
+
+        //THEN
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+    }
+
+    @Test
+    public void processNonRecurrentUserTest(){
+        //GIVEN
+        when(ticketDAO.checkIfUserIsRecurrent(any())).thenReturn(false);
+
+        //WHEN
+        underTest.processExitingVehicle();
+
+        //THEN
+        ArgumentCaptor<Ticket> ticketArgumentCaptor = ArgumentCaptor.forClass(Ticket.class);
+        verify(ticketDAO).updateTicket(ticketArgumentCaptor.capture()); //capture the ticket that was passed to ticketDAO inside parkingService.processExitingVehicle
+        Ticket capturedTicket = ticketArgumentCaptor.getValue();
+        assertThat(capturedTicket.getPrice()).isEqualTo(Fare.CAR_RATE_PER_HOUR);
+        verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+    }
+
+    @Test
+    public void processDiscountForRecurrentUsersTest () {
+        //GIVEN
+        when(ticketDAO.checkIfUserIsRecurrent(any())).thenReturn(true);
+
+        //WHEN
+        underTest.processExitingVehicle();
+
+        //THEN
+        ArgumentCaptor<Ticket> ticketArgumentCaptor = ArgumentCaptor.forClass(Ticket.class);
+        verify(ticketDAO).updateTicket(ticketArgumentCaptor.capture()); //capture the ticket that was passed to ticketDAO inside parkingService.processExitingVehicle
+        Ticket capturedTicket = ticketArgumentCaptor.getValue();
+        assertThat(capturedTicket.getPrice()).isEqualTo(Fare.CAR_RATE_PER_HOUR * 5 / 100);
     }
 
 }
