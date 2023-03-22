@@ -104,6 +104,11 @@ public class ParkingService {
             Date outTime = new Date();
             ticket.setOutTime(outTime);
             fareCalculatorService.calculateFare(ticket);
+
+            if(ticketDAO.checkIfUserIsRecurrent(vehicleRegNumber)){
+                System.out.println("Welcome back!!! Your fare will have a 5% discount.");
+                ticket.setPrice(ticket.getPrice() * 5 / 100 );
+            }
             if(ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);

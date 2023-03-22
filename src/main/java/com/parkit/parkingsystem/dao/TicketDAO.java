@@ -33,7 +33,7 @@ public class TicketDAO {
             ps.setTimestamp(5, (ticket.getOutTime() == null)?null: (new Timestamp(ticket.getOutTime().getTime())) );
             return ps.execute();
         }catch (Exception ex){
-            logger.error("Error fetching next available slot",ex);
+            logger.error("Error saving ticket",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
             return false;
@@ -62,10 +62,34 @@ public class TicketDAO {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
         }catch (Exception ex){
-            logger.error("Error fetching next available slot",ex);
+            logger.error("Error getting the ticket",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
             return ticket;
+        }
+    }
+
+    public Boolean checkIfUserIsRecurrent(String vehicleRegNumber) {
+        Connection con = null;
+        boolean isRecurrent = false;
+        try {
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.CHECK_IF_RECCURENT_USER);
+            ps.setString(1,vehicleRegNumber);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                if(rs.getInt("total") >= 2){
+                    isRecurrent = true;
+                }
+
+            }
+            dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closePreparedStatement(ps);
+        }catch (Exception ex){
+            logger.error("Error checking if user is recurrent",ex);
+        }finally {
+            dataBaseConfig.closeConnection(con);
+            return isRecurrent;
         }
     }
 
@@ -80,7 +104,7 @@ public class TicketDAO {
             ps.execute();
             return true;
         }catch (Exception ex){
-            logger.error("Error saving ticket info",ex);
+            logger.error("Error updating ticket",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
         }
