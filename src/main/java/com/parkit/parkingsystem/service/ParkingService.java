@@ -105,7 +105,7 @@ public class ParkingService {
             ticket.setOutTime(outTime);
             fareCalculatorService.calculateFare(ticket);
 
-            if(ticketDAO.checkIfUserIsRecurrent(vehicleRegNumber)){
+            if(ticketDAO.isMultipleTicket(vehicleRegNumber)){
                 System.out.println("Welcome back!!! Your fare will have a 5% discount.");
                 ticket.setPrice(ticket.getPrice() * 5 / 100 );
             }
