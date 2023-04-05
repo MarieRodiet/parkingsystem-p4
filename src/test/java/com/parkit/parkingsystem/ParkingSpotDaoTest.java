@@ -7,10 +7,8 @@ import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
-
 
 public class ParkingSpotDaoTest {
     public static ParkingSpotDAO underTest;
@@ -24,10 +22,6 @@ public class ParkingSpotDaoTest {
         dataBasePrepareService = new DataBasePrepareService();
     }
 
-    @BeforeEach
-    public void setUpPerTest(){
-        dataBasePrepareService.clearDataBaseEntries();
-    }
 
     @AfterAll
     public static void tearDown(){
@@ -47,7 +41,20 @@ public class ParkingSpotDaoTest {
     }
 
     @Test
-    public void updateInvalidParkingSpotCarTestShouldReturnFalse () {
+    public void updateParkingBikeTest () {
+        //GIVEN
+        ParkingSpot parkingSpot = new ParkingSpot(4, ParkingType.BIKE, true);
+
+        //WHEN
+        underTest.updateParking(parkingSpot);
+        int result = underTest.getNextAvailableSlot(ParkingType.BIKE);
+
+        //THEN
+        assertThat(parkingSpot.getId()).isEqualTo(result);
+    }
+
+    @Test
+    public void updateInvalidParkingSpotCarTestShouldReturnFalse()  {
         //GIVEN
         boolean isUpdated = underTest.updateParking(null);
         //WHEN > THEN
@@ -62,6 +69,21 @@ public class ParkingSpotDaoTest {
         assertThat(result).isEqualTo(-1);
     }
 
+    @Test
+    public void switchParkingTypeShouldUpdateTest () {
+        //GIVEN
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, true);
+        underTest.updateParking(parkingSpot);
+
+        //WHEN
+        int parkingNumber = underTest.getNextAvailableSlot(ParkingType.BIKE);
+        parkingSpot.setParkingType(ParkingType.BIKE);
+        parkingSpot.setId(parkingNumber);
+        boolean result = underTest.updateParking(parkingSpot);
+
+        //THEN
+        assertThat(result).isEqualTo(true);
+    }
 
 
 }

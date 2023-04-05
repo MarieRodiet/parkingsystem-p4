@@ -41,7 +41,7 @@ public class FareCalculatorServiceTest {
         ticket.setParkingSpot(parkingSpot);
 
         //WHEN
-        underTest.calculateFare(ticket);
+        underTest.calculateFare(ticket, false);
 
         //THEN
         assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR);
@@ -60,7 +60,7 @@ public class FareCalculatorServiceTest {
         ticket.setParkingSpot(parkingSpot);
 
         //WHEN
-        underTest.calculateFare(ticket);
+        underTest.calculateFare(ticket, false);
 
         //THEN
         assertEquals(ticket.getPrice(), Fare.BIKE_RATE_PER_HOUR);
@@ -79,7 +79,7 @@ public class FareCalculatorServiceTest {
         ticket.setParkingSpot(parkingSpot);
 
         //WHEN > THEN
-        assertThrows(NullPointerException.class, () -> underTest.calculateFare(ticket));
+        assertThrows(NullPointerException.class, () -> underTest.calculateFare(ticket, false));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class FareCalculatorServiceTest {
         ticket.setParkingSpot(parkingSpot);
 
         //WHEN > THEN
-        assertThrows(IllegalArgumentException.class, () -> underTest.calculateFare(ticket));
+        assertThrows(IllegalArgumentException.class, () -> underTest.calculateFare(ticket, false));
     }
 
     @Test
@@ -111,10 +111,10 @@ public class FareCalculatorServiceTest {
         ticket.setParkingSpot(parkingSpot);
 
         //WHEN
-        underTest.calculateFare(ticket);
+        underTest.calculateFare(ticket, false);
 
         //THEN
-        assertEquals((0.75 * Fare.BIKE_RATE_PER_HOUR), ticket.getPrice() );
+        assertEquals((0.75 * Fare.BIKE_RATE_PER_HOUR),ticket.getPrice() );
     }
 
     @Test
@@ -130,10 +130,10 @@ public class FareCalculatorServiceTest {
         ticket.setParkingSpot(parkingSpot);
 
         //WHEN
-        underTest.calculateFare(ticket);
+        underTest.calculateFare(ticket, false);
 
         //THEN
-        assertEquals( (0.75 * Fare.CAR_RATE_PER_HOUR) , ticket.getPrice());
+        assertEquals((0.75 * Fare.CAR_RATE_PER_HOUR),ticket.getPrice());
     }
 
     @Test
@@ -149,10 +149,10 @@ public class FareCalculatorServiceTest {
         ticket.setParkingSpot(parkingSpot);
 
         //WHEN
-        underTest.calculateFare(ticket);
+        underTest.calculateFare(ticket, false);
 
         //THEN
-        assertEquals( (24 * Fare.CAR_RATE_PER_HOUR) , ticket.getPrice());
+        assertEquals((24 * Fare.CAR_RATE_PER_HOUR),ticket.getPrice());
     }
 
     @Test
@@ -168,10 +168,10 @@ public class FareCalculatorServiceTest {
         ticket.setParkingSpot(parkingSpot);
 
         //WHEN
-        underTest.calculateFare(ticket);
+        underTest.calculateFare(ticket, false);
 
         //THEN
-        assertEquals( (0 * Fare.CAR_RATE_PER_HOUR) , ticket.getPrice());
+        assertEquals((0 * Fare.CAR_RATE_PER_HOUR),ticket.getPrice());
     }
 
 }

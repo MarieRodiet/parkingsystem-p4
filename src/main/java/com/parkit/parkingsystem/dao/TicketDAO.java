@@ -69,17 +69,17 @@ public class TicketDAO {
         }
     }
 
-    public Boolean checkIfUserIsRecurrent(String vehicleRegNumber) {
+    public Boolean isMultipleTicket(String vehicleRegNumber) {
         Connection con = null;
-        boolean isRecurrent = false;
+        boolean isMultiple = false;
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.CHECK_IF_RECCURENT_USER);
+            PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKETS);
             ps.setString(1,vehicleRegNumber);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 if(rs.getInt("total") >= 2){
-                    isRecurrent = true;
+                    isMultiple = true;
                 }
 
             }
@@ -89,7 +89,7 @@ public class TicketDAO {
             logger.error("Error checking if user is recurrent",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
-            return isRecurrent;
+            return isMultiple;
         }
     }
 

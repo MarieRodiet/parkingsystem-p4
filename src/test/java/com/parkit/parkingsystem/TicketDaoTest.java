@@ -129,7 +129,7 @@ public class TicketDaoTest {
     @Test
     public void itShouldReturnFalseForNonRecurrentUser(){
         //GIVEN > WHEN
-        Boolean isRecurrent = underTest.checkIfUserIsRecurrent("FIRSTTIME");
+        Boolean isRecurrent = underTest.isMultipleTicket("FIRSTTIME");
         //THEN
         assertThat(isRecurrent).isFalse();
     }
@@ -151,7 +151,7 @@ public class TicketDaoTest {
         //WHEN
         underTest.saveTicket(ticket);
         underTest.saveTicket(ticket);
-        Boolean isRecurrent = underTest.checkIfUserIsRecurrent("IAMACAR");
+        Boolean isRecurrent = underTest.isMultipleTicket("IAMACAR");
         //THEN
         assertThat(isRecurrent).isTrue();
     }
