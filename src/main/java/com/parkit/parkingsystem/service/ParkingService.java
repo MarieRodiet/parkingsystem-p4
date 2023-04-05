@@ -103,16 +103,15 @@ public class ParkingService {
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
             Date outTime = new Date();
             ticket.setOutTime(outTime);
-            fareCalculatorService.calculateFare(ticket);
-
-            if(ticketDAO.isMultipleTicket(vehicleRegNumber)){
-                System.out.println("Welcome back!!! Your fare will have a 5% discount.");
-                ticket.setPrice(ticket.getPrice() * 5 / 100 );
-            }
+            Boolean isUserRecurrent = ticketDAO.isMultipleTicket(vehicleRegNumber);
+            fareCalculatorService.calculateFare(ticket, isUserRecurrent);
             if(ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
+                if(isUserRecurrent){
+                    System.out.println("Your parking fare gets a 5% discount as you are a recurrent user!");
+                }
                 System.out.println("Please pay the parking fare:" + ticket.getPrice());
                 System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
             }else{
